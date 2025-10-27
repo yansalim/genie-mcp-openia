@@ -5,11 +5,12 @@ services:
     container_name: genie-mcp
     ports:
       - "9998:9998"
+      - "9999:8887"
     volumes:
       - ./genie:/workspace               # estado do Genie (.genie/, logs, etc.)
     restart: always
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:9998/ping"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9998/ping || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
