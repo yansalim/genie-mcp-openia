@@ -1,0 +1,24 @@
+
+services:
+  genie-mcp:
+    build: .
+    container_name: genie-mcp
+    ports:
+      - "9998:9998"
+    volumes:
+      - ./genie:/workspace               # estado do Genie (.genie/, logs, etc.)
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9998/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  # (Opcional) Tunnel HTTPS efêmero com Cloudflare para conectar no ChatGPT
+  # Você pode comentar este serviço se já tiver Nginx+TLS.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --url http://genie-mcp:9998
+    depends_on:
+      - genie-mcp
+    restart: unless-stopped
